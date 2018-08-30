@@ -143,6 +143,8 @@ and the derived files           dkub-minutes.ins,
 %    \item |calc|
 %    \item |graphicx|
 %    \item |xstring|
+%    \item |pdfpages|
+%    \item |multirow|
 % \end{itemize}
 % 
 % \section{Overview}
@@ -299,6 +301,7 @@ and the derived files           dkub-minutes.ins,
 \RequirePackage{calc}
 \RequirePackage{graphicx}
 \RequirePackage{multirow}
+\RequirePackage{pdfpages}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -612,7 +615,21 @@ and the derived files           dkub-minutes.ins,
   \shortdate{August 2018}
   
   \maketitle
-  \topic{A Topic}
+  \topic{Call to Order}
+  \callToOrder
+
+  \topic{Who Brings Snacks?}
+  \voteUnam{BrimZ brings the snacks.}
+  \motionedby{Amora}{Luna}
+
+  \topic{Future Meetings}
+  \voteUnamAgainst{Stop future meetings.}
+  \motionedby{BrimZ}{Cook}
+
+  \appendix
+  \insertPdfSection{A Single Page Example}{appendix:singlepage}{singlepage.pdf}
+  \insertPdfSection{A Mulitpage Example}{appendix:multipage}{multipage.pdf}
+  
 \end{Minutes}
 \end{document}
 %    \end{macrocode}

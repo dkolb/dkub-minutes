@@ -14,6 +14,10 @@
 #    clean   : removes the obj/ directory holding temporary files
 
 TEXMFHOMEDIR = $(shell kpsewhich -var-value=TEXMFHOME)
+INST_TEX     = $(TEXMFHOMEDIR)/tex/latex/$(PROJECT_NAME) 
+INST_SOURCE  = $(TEXMFHOMEDIR)/source/latex/$(PROJECT_NAME) 
+INST_DOC     = $(TEXMFHOMEDIR)/doc/latex/$(PROJECT_NAME)
+
 
 PROJECT_NAME = dkub-minutes
 PROJECT_FILE = $(PROJECT_NAME).dtx
@@ -59,17 +63,16 @@ endif
 clean::
 	rm -rf obj/
 
-install: clean obj/$(PROJECT_NAME).pdf
-	echo "Installing..."
-	install -v -d obj/$(PROJECT_NAME).sty $(TEXMFHOMEDIR)/tex/latex/$(PROJECT_NAME)
-	install -v -d latexmk Makefile obj/$(PROJECT_NAME).ins $(PROJECT_FILE) $(PROJECT_NAME)-example.tex $(TEXMFHOMEDIR)/source/latex/$(PROJECT_NAME)
-	install -v -d obj/
+install: obj/$(PROJECT_NAME).pdf obj/$(PROJECT_NAME)-example.pdf
+	install -d -v $(INST_TEX) $(INST_SOURCE) $(INST_DOC)
+	install obj/$(PROJECT_NAME).sty $(INST_TEX)
+	install -v latexmkrc Makefile obj/$(PROJECT_NAME).ins $(PROJECT_FILE) \
+		obj/$(PROJECT_NAME)-example.tex $(INST_SOURCE)
+	install -v obj/$(PROJECT_NAME).pdf \
+		obj/$(PROJECT_NAME)-example.pdf $(INST_DOC)
 
-
-
-
-
-	
+uninstall:
+	rm -rf $(INST_TEX) $(INST_SOURCE) $(INST_DOC)
 
 ### Core Latex Generation
 # Performs the typical build process for latex generations so that all
@@ -92,3 +95,6 @@ obj/:
 
 obj/$(PROJECT_NAME).pdf: obj/
 	latexmk -pdf $(PROJECT_FILE)
+
+obj/$(PROJECT_NAME)-example.pdf: obj/$(PROJECT_NAME).pdf
+	latexmk -pdf obj/$(PROJECT_NAME)-example.tex

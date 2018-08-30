@@ -74,8 +74,13 @@ install: obj/$(PROJECT_NAME).pdf obj/$(PROJECT_NAME)-example.pdf
 	install -v obj/$(PROJECT_NAME).pdf \
 		obj/$(PROJECT_NAME)-example.pdf $(INST_DOC)
 
+install-texstudio:
+	install -d -v $$HOME/.config/texstudio/completion/user
+	install dkub-minutes.cwl $$HOME/.config/texstudio/completion/user
+
 uninstall:
 	rm -rf $(INST_TEX) $(INST_SOURCE) $(INST_DOC)
+	rm $$HOME/.config/texstudio/completion/user/dkub-minutes.cwl
 
 ### Core Latex Generation
 # Performs the typical build process for latex generations so that all

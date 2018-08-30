@@ -27,6 +27,9 @@ default: obj/$(PROJECT_NAME).pdf
 display: default
 	(${PDFVIEWER} obj/$(PROJECT_NAME).pdf &)
 
+example: obj/$(PROJECT_NAME)-example.pdf
+	(${PDFVIEWER} obj/$(PROJECT_NAME)-example.pdf &)
+
 
 TEXINPUTS = .:obj/
 TEXMFOUTPUT = obj/

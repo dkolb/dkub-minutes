@@ -11,8 +11,19 @@ Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt
 ----------------------------------------------------------------
 
-This modification adds several commands and counters to enable
-you to write minutes faster, possibly even as the meeting occurs.
+This is a pretty brittle and personal modification of the minutes
+package.  It require LaTeX, requires a ton of other packages,
+and probably will break when I install this on another machine.
+
+Enjoy!
+
+If you want to "complie" the dtx file into it's various compoents,
+please simply run `make` or `make display`.
+
+`make install` will distribute the files into your TEXMFHOME using
+TDS layout.  `make uninstall` will delete them back out.
+
+Do not forget to run `texhash` after you're done!
 
 %</readme>
 %<*internal>
@@ -93,6 +104,11 @@ and the derived files           dkub-minutes.ins,
 \setlength{\parskip}{2ex}
 \setcounter{IndexColumns}{2}
 
+% Undo the table of contents renaming.
+\addto\captionsenglish{%
+  \renewcommand{\contentsname}{Table of Contents}
+}
+
 \EnableCrossrefs 
 \CodelineIndex 
 \RecordChanges 
@@ -110,7 +126,21 @@ and the derived files           dkub-minutes.ins,
 % \DoNotIndex{\newcounter,\newlength,\par,\raggedright,\RequirePackage}
 % \DoNotIndex{\resizebox,\rightlabellength,\section,\setlength,\sffamily}
 % \DoNotIndex{\StrGobbleLeft,\tableofcontents,\textwidth,\toprule}
-% \DoNotIndex{\widthof}
+% \DoNotIndex{\widthof,\\,\addto,\addtocounter,\appendix,\arraybackslash}
+% \DoNotIndex{\attendancelabellength, \attendancelistlength,\documentclass}
+% \DoNotIndex{\graphicspath,\heightof,\includegraphics,\includepdf,\imageHeight}
+% \DoNotIndex{\min@calledby,\min@date,\min@guest,\min@location,\min@logo}
+% \DoNotIndex{\min@logoscale,\min@maketitle,\min@minutetaker,\min@missing}
+% \DoNotIndex{\min@moderation,\min@participant,\min@shortdate,\min@starttime}
+% \DoNotIndex{\min@textLocation,\min@textMinutesTaker,\min@textModerator}
+% \DoNotIndex{\min@textNoVote,\min@textPresent,\min@timekeeper,\min@title}
+% \DoNotIndex{\minutes@titlesettrue,\minutesdate,\minutetaker,\missing}
+% \DoNotIndex{\moderation,\multicolumn,\namecolumnlength,\newcommand}
+% \DoNotIndex{\paddingRowHeight,\participant,\quorumMinimum,\renewcommand}
+% \DoNotIndex{\textbf,\textRowHeight,\theAbsentCounter,\theAttendeeCounter}
+% \DoNotIndex{\theGuestCounter,\topic,\totalMembership,\usepackage}
+% \DoNotIndex{\min@meetingtype,\min@participiant}
+%
 %
 % \title{The \textsf{dkub-minutes} package\thanks{This document corresponds
 %   to \textsf{dkub-minutes} \fileversion{}, dated \filedate{}.}}
@@ -126,6 +156,8 @@ and the derived files           dkub-minutes.ins,
 %   \footnote{\url{https://ctan.org/pkg/minutes}} to assist in writing
 %   minutes while the meeting takes place.
 % \end{abstract}
+%
+% \tableofcontents
 %
 % \PrintChanges
 %
@@ -148,7 +180,7 @@ and the derived files           dkub-minutes.ins,
 % \end{itemize}
 % 
 % \section{Overview}
-% \subsection{Babel}
+% \subsection{Babel Changes}
 % The package redefines several bable strings to better align with 
 % my organizations preferences.
 %
@@ -163,76 +195,98 @@ and the derived files           dkub-minutes.ins,
 %
 % 
 %
-% \subsection{New Macros}
+% \subsection{Title Settings Macros}
+%
+% This package completely redefines the minutes package title macro,
+% |\min@maketitle|.  This header requires a logo header, for now.  When
+% I get some free time (or if you want to yourself) I'm going to work on
+% making it optional by adding a non-logo layout that's similar but more
+% compact.
+%
+% In the meantime, you must set |\logo| and |\logoscale|.  Not setting them
+% will cause mysterious errors that make little sense.
+%
 % \DescribeMacro{\shortdate}
 % \marg{text}
 %
 % This sets the short date, normally something like |January 2018| for
 % later use in the customized title.
 %
-% \DescribeMacro{\meetingType}
+% \DescribeMacro{\meetingtype}
 % \marg{text}
 %
 % This sets the meeting type, normally something like |General Membership| or
 % |Board| for later use in the customized title.
 %
-% \DescribeMacro{\calledby\marg{name}}
+% \DescribeMacro{\calledby}
+% \marg{name}
+%
 % This sets the name of the person who called the meeting for
 % later use in the customized title.
 %
-% \DescribeMacro{\timekeepwer\marg{name}}
+% \DescribeMacro{\timekeepwer}
+% \marg{name}
+%
 % This sets the name of the person who is the time keeper for
 % later use in the customized title.
 %
-% \DescribeMacro{\logo\marg{file}}
+% \DescribeMacro{\logo}
+% \marg{file}
+%
 % This sets the logo used in the custom title.  Please ensure you've set
 % the |\graphicspath| of the |graphicx| package (required by |dkub-minutes|)
 % to point where this file is located. Use the file name w/out an extension.
 %
-% \DescribeMacro{\logoscale\marg{scale}}
+% \DescribeMacro{\logoscale}
+% \marg{scale}
+%
 % This takes a floating point number like |.5| given to the |scale| option
 % of |\includegraphics| which pulls in your logo.  So
 % |\logo{mylogo}\logoscale{.5}| will translate to
 % |\includegraphics[scale=\min@logoscale]{\logo}|
 %
-% \DescribeMacro{\attendee\marg{name}}
+% \subsection{Macros for Keeping Attendance}
+%
+% \DescribeMacro{\attendee}
+% \marg{name}
+%
 % This sets an attendee.  All calls to |\attendee| are saved
 % in order and then sent to the minutes package's |\present| 
 % when |\attendeeDone| is called.  Furthermore this call increments 
 % |\theAttendeeCounter|
 %
 % \DescribeMacro{\attendeeDone}
+%
 % Calls minutes package's |\present| with a comma seperated list of the names passed
 % to subsequenct calls of |\attendee|
 %
-% \DescribeMacro{\absent\marg{name}}
+% \DescribeMacro{\absent}
+% \marg{name}
+%
 % The same as |\attendee| but for people who are not present. Increments
 % |\theAbsentCounter|
 %
 % \DescribeMacro{\attendeeDone}
+%
 % Calls minutes package's |\missing| with a comma seperated list of the names passed
 % to subsequenct calls of |\absent|
 
-% \DescribeMacro{\aGuest\marg{name}}
+% \DescribeMacro{\aGuest}
+% \marg{name}
+%
 % The same as |\attendee| but for guests. Increments
 % |\theGuestCounter|
 %
 % \DescribeMacro{\guestDone}
+%
 % Calls minutes package's |\guest| with a comma seperated list of the names passed
 % to subsequenct calls of |\aGuest|
 %
-% \DescribeMacro{\motionedby\marg{1}\marg{2}}
-% Outputs a small table listing who made a motion.  Generally used as:
+% \subsection{Automation of Quorum Verification}
 %
-% \begin{verbatim}
-%     \motionedby{Mary}{Sam}
-% \end{verbatim}
+% \DescribeMacro{\callToOrder}
+% \marg{time}
 %
-% Results in:
-%
-% \motionedby{Mary}{Sam}
-%
-% \DescribeMacro{\callToOrder\marg{time}}
 % This generates a table counting membership, listing the minimum needed
 % for quroum, and whether or not you have quorum.  The total count of 
 % calls to |\attendee| and |\absent| are used for total members.  Quorum is
@@ -256,21 +310,40 @@ and the derived files           dkub-minutes.ins,
 % \attendeeDone
 % \absentDone
 % \guestDone
-% \callToOrder
+% \callToOrder\par
 %
-% \DescribeMacro{\voteUnam\marg{topic}}
+% \subsection{Macros to help with the vote macro }
+%
+% \DescribeMacro{\voteUnam}
+% \marg{topic}
+%
 % You may vote unanimously for a motion often.  This uses |\theAttendeeCounter|
 % to generate a call to minutes's |\vote| passing through the |topic| as
 % the description of the vote with all votes in favor.
 %
-% \DescribeMacro{\voteUnamAgainst\marg{topic}}
+% \DescribeMacro{\voteUnamAgainst}
+% \marg{topic}
+%
 % The same as |\votUnam| but instead with all votes against the topic.
 %
+% \DescribeMacro{\motionedby}
+% \marg{1}\marg{2}
+%
+% Outputs a small table listing who made a motion.  Generally used as:
+%
+% \begin{verbatim}
+%     \motionedby{Mary}{Sam}
+% \end{verbatim}
+%
+% Results in:
+%
+% \motionedby{Mary}{Sam}
+%
+% \subsection{Macros for Inserting Attachments in the Appendix}
+%
 % \DescribeMacro{\insertPdfSection}
-% Inserts a PDF document as a section complete with a label using |\includepdf|.
-% this uses the format of 
-% |\insertPdfSection|\oarg{p}\marg{name}\marg{label}\marg{pdfPath}
-% 
+% \oarg{multi}\marg{name}\marg{label}\marg{pdfPath}
+%
 % \oarg{p} can be either |single| or |multi|, it defaults to single.  This is
 % needed because we insert the first page using custom |pagecommand| and
 % |scale| options.
@@ -280,7 +353,17 @@ and the derived files           dkub-minutes.ins,
 % \marg{label} is the section label. Passed to |\label|.
 %
 % \marg{pdfPath} is the path to the PDF file to insert.
-% \section{Implementtation}
+%
+% This was mostly implemented since the meetings I take minutes for often have
+% handouts and other items.  PDF is a pretty easy format to get both physical
+% and digital documents into.  The first page is inserted at a |0.8| scale to
+% make room for a |\section| header.  If your document type has weirdly large
+% headers or some such, it might not work out.
+%
+% The remaining pages are inserted a full size but without the custom 
+% |pagecommand| option.
+%
+% \section{Implementation}
 %
 % \StopEventually{^^A
 %   \PrintIndex
@@ -288,6 +371,8 @@ and the derived files           dkub-minutes.ins,
 % \iffalse
 %<*package>
 % \fi
+%
+% \subsection{Setup}
 % 
 % This requires the necessary packages.
 %    \begin{macrocode}
@@ -304,6 +389,9 @@ and the derived files           dkub-minutes.ins,
 \RequirePackage{pdfpages}
 %    \end{macrocode}
 %
+% \subsection{Babel Modifications}
+% Here we update several babel strings to give us the titles and phrases
+% we want out of various parts of the minutes package.
 %    \begin{macrocode}
 \addto\extrasenglish{%
   \def\min@textModerator{Chair}%
@@ -317,7 +405,7 @@ and the derived files           dkub-minutes.ins,
 }
 %    \end{macrocode}
 %
-% \subsection{Additional text values}
+% \subsection{Title Settings Macros}
 %
 %\begin{macro}{\shortdate}
 %    \begin{macrocode}
@@ -361,11 +449,16 @@ and the derived files           dkub-minutes.ins,
 %    \end{macrocode}
 %\end{macro}
 %
+% \subsection{Attendee Macros}
+%
 %\begin{macro}{\attendee}
 %    \begin{macrocode}
 \newcounter{AttendeeCounter}
 \edef\attendeeList{ }
-\newcommand{\attendee}[1]{\addtocounter{AttendeeCounter}{1}\edef\attendeeList{\attendeeList, #1}}
+\newcommand{\attendee}[1]{%
+  \addtocounter{AttendeeCounter}{1}
+  \edef\attendeeList{\attendeeList, #1}
+}
 %    \end{macrocode}
 %\end{macro}
 %
@@ -375,6 +468,8 @@ and the derived files           dkub-minutes.ins,
 %    \end{macrocode}
 %\end{macro}
 %
+% \subsection{Absent Macros}
+% 
 %\begin{macro}{\absent}
 %    \begin{macrocode}
 \newcounter{AbsentCounter}
@@ -388,6 +483,8 @@ and the derived files           dkub-minutes.ins,
 \newcommand{\absentDone}{\missing{\StrGobbleLeft{\absentList}{2}}}
 %    \end{macrocode}
 %\end{macro}
+%
+% \subsection{Guest Macros}
 %
 %\begin{macro}{\aGuest}
 %    \begin{macrocode}
@@ -403,6 +500,8 @@ and the derived files           dkub-minutes.ins,
 %    \end{macrocode}
 %\end{macro}
 %
+%\subsection{Motioned By}
+%
 %\begin{macro}{\motionedby}
 %    \begin{macrocode}
 \newcommand{\motionedby}[2]{
@@ -417,6 +516,9 @@ and the derived files           dkub-minutes.ins,
 %\begin{macro}{\minuteshead}
 % This macro defines a custom header and then redefs it to |\maketitle|.
 %
+% Begin by setting minute's package's internal flag to indicate we generated
+% a title.  Otherwise several macros freak out.
+% 
 %    \begin{macrocode}
 \def\minuteshead{%
   \minutes@titlesettrue
@@ -424,6 +526,10 @@ and the derived files           dkub-minutes.ins,
 %
 % Some math for column lengths. First find the max width of the 
 % moderator/minutestaker/calledby/timekeeper names for second column.
+% Finally, compare it with the width of the longest static label from the
+% upper half of the table, just in case all the names are short.
+% (Like in the example.)
+%
 %    \begin{macrocode}
     \newlength{\namecolumnlength}
     \setlength{\namecolumnlength}%
@@ -432,6 +538,8 @@ and the derived files           dkub-minutes.ins,
       {\maxof{\namecolumnlength}{\widthof{\min@timekeeper}}}
     \setlength{\namecolumnlength}%
       {\maxof{\namecolumnlength}{\widthof{\min@calledby}}}
+    \setlength{\namecolumnlength}%
+      {\maxof{\namecolumnlength}{\widthof{\textbf{Location:}}}}
 %    \end{macrocode}
 %
 % Next take half the table width, subtract the name column, to get the left 
@@ -499,7 +607,7 @@ and the derived files           dkub-minutes.ins,
           X}
                 \toprule
                 \multirow{4}{*}{%
-                  \includegraphics[width=\min@logoscale\textwidth]{\min@logo}%
+                  \includegraphics[scale=\min@logoscale]{\min@logo}%
                 } & 
                 \multicolumn{3}{l}{%
                   \bfseries\sffamily{ \min@shortdate{} \min@title }%
@@ -518,6 +626,11 @@ and the derived files           dkub-minutes.ins,
                 \midrule
         \end{tabularx}
     }\par
+%    \end{macrocode}
+%
+% Yes, that typo is actually how the internal reference for the minutes package
+% is spelled.  Anywho, this lays out the attendance table.
+%    \begin{macrocode} 
     \begin{tabularx}{\textwidth}{l c r X}
         \textbf{Present} &(\theAttendeeCounter) & : & \min@participiant \\
         \textbf{Absent} & (\theAbsentCounter) & : & \min@missing \\
@@ -528,6 +641,8 @@ and the derived files           dkub-minutes.ins,
 \def\min@maketitle{\minuteshead}
 %    \end{macrocode}
 %\end{macro}
+%
+% \subsection{Call To Order}
 %
 %\begin{macro}{\callToOrder}
 % This takes the absent and attendee counters and computes if quorum is present.
@@ -555,6 +670,8 @@ and the derived files           dkub-minutes.ins,
 %    \end{macrocode}
 %\end{macro}
 %
+% \subsection{Voting Macros}
+%
 %\begin{macro}{\voteUnam}
 %    \begin{macrocode}
 \newcommand{\voteUnam}[1]{\vote{#1}{\theAttendeeCounter}{0}{0}}
@@ -566,6 +683,8 @@ and the derived files           dkub-minutes.ins,
 \newcommand{\voteUnamAgainst}[1]{\vote{#1}{0}{\theAttendeeCounter}{0}}
 %    \end{macrocode}
 %\end{macro}
+%
+% \subsection{PDF File Insertion}
 %
 %\begin{macro}{\insertPdfSection}
 %    \begin{macrocode}

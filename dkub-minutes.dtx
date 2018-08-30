@@ -1,0 +1,502 @@
+% \iffalse meta-comment
+% !TEX program  = pdfLaTeX
+%<*internal>
+\iffalse
+%</internal>
+%<*readme>
+----------------------------------------------------------------
+dkub-minutes --- A mod of the minutes package
+E-mail: david.c.kolb@gmail.com
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+----------------------------------------------------------------
+
+This modification adds several commands and counters to enable
+you to write minutes faster, possibly even as the meeting occurs.
+
+%</readme>
+%<*internal>
+\fi
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+%</internal>
+%<*install>
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+\preamble
+----------------------------------------------------------------
+dkub-minutes --- A mod of the minutes package
+E-mail: david.c.kolb@gmail.com
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+----------------------------------------------------------------
+\endpreamble
+\postamble
+
+Copyright (C) 2018 David Kolb <david.c.kolb@gmail.com>
+
+This work may be distributed and/or modified under the
+conditions of the LaTeX Project Public License (LPPL), either
+version 1.3c of this license or (at your option) any later
+version.  The latest version of this license is in the file:
+
+http://www.latex-project.org/lppl.txt
+
+This work is "maintained" (as per LPPL maintenance status) by
+You.
+
+This work consists of the file  dkub-minutes.dtx
+and the derived files           dkub-minutes.ins,
+                                dkub-minutes.pdf and
+                                dkub-minutes.sty.
+
+\endpostamble
+\usedir{tex/latex/dkub-minutes}
+\generate{
+  \file{\jobname.sty}{\from{\jobname.dtx}{package}}
+}
+%</install>
+%<install>\endbatchfile
+%<*internal>
+\usedir{source/latex/dkub-minutes}
+\generate{
+  \file{\jobname.ins}{\from{\jobname.dtx}{install}}
+}
+\nopreamble\nopostamble
+\usedir{doc/latex/dkub-minutes}
+\generate{
+  \file{README.txt}{\from{\jobname.dtx}{readme}}
+}
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
+%</internal>
+%<*package>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{dkub-minutes}[2018/08/29 v1.0 mods]
+\RequirePackage{hyperref}
+\RequirePackage{minutes}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{booktabs}
+\RequirePackage{fp}
+%</package>
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{\jobname}
+\EnableCrossrefs 
+\CodelineIndex 
+\begin{document}
+  \RecordChanges 
+  \DocInput{dkub-minutes.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \GetFileInfo{dkub-minutes.sty}
+%
+% \CheckSum{0}
+%
+% \title{The \textsf{dkub-minutes} package\thanks{This document corresponds
+%   to \textsf{dkub-minutes} \fileversion{}, dated \filedate{}.}}
+% \author{David Kolb \\ \texttt{david.c.kolb@gmail.com}}
+%
+% \maketitle
+%
+% \changes{1.0}{2018/08/29}{Initial version}
+%
+% \begin{abstract}
+%   This package provides some modifications to the minutes package
+%   \footnote{\url{https://ctan.org/pkg/minutes}} to assist in writing
+%   minutes while the meeting takes place.
+% \end{abstract}
+%
+% \part{Usage}
+% This package should be used via \texttt{\\usepackage\{dkub-minutes\}} but 
+% it must follow after \texttt{\\usepackage\{minutes\}}.
+% 
+%\StopEventually{^^A
+%  \PrintChanges
+%  \PrintIndex
+%}
+% \section{Overview}
+% \subsection{Babel}
+% The package redefines several bable strings to better align with 
+% my organizations preferences.
+%
+% \begin{tabular}{l l}
+%   Moderator & Chair \\
+%   No vote & Abstain \\
+%   Minutes taker & Time and Record Keeper \\
+%   Those present & Present \\
+%   Location of the meeting & Location \\
+%   Overview of topics & Overview of Topics \\
+% \end{tabular}
+%
+% \subsection{New Macros}
+% \DescribeMacro{\shortdate\marg{text}}
+% This sets the short date, normally something like |January 2018| for
+% later use in the customized title.
+%
+% \DescribeMacro{\meetingType\marg{text}}
+% This sets the meeting type, normally something like |General Membership| or
+% |Board| for later use in the customized title.
+%
+% \DescribeMacro{\calledby\marg{name}}
+% This sets the name of the person who called the meeting for
+% later use in the customized title.
+%
+% \DescribeMacro{\timekeepwer\marg{name}}
+% This sets the name of the person who is the time keeper for
+% later use in the customized title.
+%
+% \DescribeMacro{\logo\marg{file}}
+% This sets the logo used in the custom title.  Please ensure you've set
+% the |\graphicspath| of the |graphicx| package (required by |dkub-minutes|)
+% to point where this file is located. Use the file name w/out an extension.
+%
+% \DescribeMacro{\logoscale\marg{scale}}
+% This takes a floating point number like |.5|.  It ends up using it in
+% the logo's include graphics as the scale against |\textwidth|.  So
+% |\logo{mylogo}\logoscale{.5}| will translate to
+% |\includegraphics[width=\min@logoscale\textwidth]{\logo}|
+%
+% \DescribeMacro{\attendee\marg{name}}
+% This sets an attendee.  All calls to |\attendee| are saved
+% in order and then sent to the minutes package's |\present| 
+% when |\attendeeDone| is called.  Furthermore this call increments 
+% |\theAttendeeCounter|
+%
+% \DescribeMacro{\attendeeDone}
+% Calls minutes package's |\present| with a comma seperated list of the names passed
+% to subsequenct calls of |\attendee|
+%
+% \DescribeMacro{\absent\marg{name}}
+% The same as |\attendee| but for people who are not present. Increments
+% |\theAbsentCounter|
+%
+% \DescribeMacro{\attendeeDone}
+% Calls minutes package's |\missing| with a comma seperated list of the names passed
+% to subsequenct calls of |\absent|
+
+% \DescribeMacro{\aGuest\marg{name}}
+% The same as |\attendee| but for guests. Increments
+% |\theGuestCounter|
+%
+% \DescribeMacro{\guestDone}
+% Calls minutes package's |\guest| with a comma seperated list of the names passed
+% to subsequenct calls of |\aGuest|
+%
+% \DescribeMacro{\motionedby\marg{1}\marg{2}}
+% Outputs a small table listing who made a motion.  Generally used as:
+%
+% \begin{verbatim}
+%     \motionedby{Mary}{Sam}
+% \end{verbatim}
+%
+% Results in:
+%
+% \motionedby{Mary}{Sam}
+%
+% \DescribeMacro{\callToOrder\marg{time}}
+% This generates a table counting membership, listing the minimum needed
+% for quroum, and whether or not you have quorum.  The total count of 
+% calls to |\attendee| and |\absent| are used for total members.  Quorum is
+% defined as total members divided by two, rounded up.  An example follows.
+%
+% \begin{verbatim}
+% \attendee{Sam}
+% \attendee{Sandra}
+% \attendee{Clara}
+% \absent{Greg}
+% \attendeeDone
+% \absentDone
+% \guestDone
+% \callToOrder
+% \end{verbatim}
+%
+% \attendee{Sam}
+% \attendee{Sandra}
+% \attendee{Clara}
+% \absent{Greg}
+% \attendeeDone
+% \absentDone
+% \guestDone
+% \callToOrder
+%
+% \DescribeMacro{\voteUnam\marg{topic}}
+% You may vote unanimously for a motion often.  This uses |\theAttendeeCounter|
+% to generate a call to minutes's |\vote| passing through the |topic| as
+% the description of the vote with all votes in favor.
+%
+% \DescribeMacro{\voteUnamAgainst\marg{topic}}
+% The same as |\votUnam| but instead with all votes against the topic.
+%
+% \DescribeMacro{\insertPdfSection}
+% Inserts a PDF document as a section complete with a label using |\includepdf|.
+% this uses the format of 
+% |\insertPdfSection|\oarg{p}\marg{name}\marg{label}\marg{pdfPath}
+% 
+% \oarg{p} can be either |single| or |multi|, it defaults to single.  This is
+% needed because we insert the first page using custom |pagecommand| and
+% |scale| options.
+% 
+% \marg{name} is the name of the section. Passed to |\section|
+%
+% \marg{label} is the section label. Passed to |\label|.
+%
+% \marg{pdfPath} is the path to the PDF file to insert.
+% \section{Implementtation}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%
+% \subsection{Babel Updates}
+%
+%    \begin{macrocode}
+\addto\extrasenglish{%
+  \def\min@textModerator{Chair}%
+  \def\min@textNoVote{Abstain}%
+    \def\min@textMinutesTaker{Time and Record Keeper}
+    \def\min@textPresent{Present}%
+    \def\min@textLocation{Location}%
+}
+\addto\captionsenglish{%
+  \renewcommand{\contentsname}{Overview of Topics}
+}
+%    \end{macrocode}
+%
+% \subsection{Additional text values}
+%
+%\begin{macro}{\shortdate}
+%    \begin{macrocode}
+\def\min@shortdate{ }
+\def\shortdate#1{\def\min@shortdate{#1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\meetingType}
+%    \begin{macrocode}
+\def\min@meetingtype{ }
+\def\meetingtype#1{\def\min@meetingtype{#1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\calledby}
+%    \begin{macrocode}
+\def\min@calledby{ }
+\def\calledby#1{\def\min@calledby{#1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\timekeeper}
+%    \begin{macrocode}
+\def\min@timekeeper{ }
+\def\timekeeper#1{\def\min@timekeeper{#1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\logo}
+%    \begin{macrocode}
+\def\min@logo{ }
+\def\logo#1{\def\min@logo{#1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\logoscale}
+%    \begin{macrocode}
+\def\min@logoscale{ }
+\def\logoscale#1{\def\min@logoscale{#1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\attendee}
+%    \begin{macrocode}
+\newcounter{AttendeeCounter}
+\edef\attendeeList{ }
+\newcommand{\attendee}[1]{\addtocounter{AttendeeCounter}{1}\edef\attendeeList{\attendeeList, #1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\atendeeDone}
+%    \begin{macrocode}
+\newcommand{\attendeeDone}{\participant{\StrGobbleLeft{\attendeeList}{2}}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\absent}
+%    \begin{macrocode}
+\newcounter{AbsentCounter}
+\edef\absentList{ }
+\newcommand{\absent}[1]{\addtocounter{AbsentCounter}{1}\edef\absentList{\absentList, #1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\absentDone}
+%    \begin{macrocode}
+\newcommand{\absentDone}{\missing{\StrGobbleLeft{\absentList}{2}}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\aGuest}
+%    \begin{macrocode}
+\newcounter{GuestCounter}
+\edef\guestList{ }
+\newcommand{\aGuest}[1]{\addtocounter{GuestCounter}{1}\edef\guestList{\guestList, #1}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\guestDone}
+%    \begin{macrocode}
+\newcommand{\guestDone}{\guest{\StrGobbleLeft{\guestList{}}{2}}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\motionedby}
+%    \begin{macrocode}
+\newcommand{\motionedby}[2]{
+  \begin{tabularx}{\textwidth}{l X}
+        Motioned By: & #1 \\
+        Seconded By: & #2 \\
+    \end{tabularx}
+}
+%    \end{macrocode}
+%\end{macro}
+
+%\begin{macro}{\minuteshead}
+% This macro defines a custom header and then redefs it to |\maketitle|.
+%
+%    \begin{macrocode}
+\def\minuteshead{%
+  \minutes@titlesettrue
+%    \end{macrocode}
+%
+% Some math for column lengths. First find the max width of the 
+% moderator/minutestaker/calledby/timekeeper names for second column.
+%    \begin{macrocode}
+    \newlength{\namecolumnlength}
+    \setlength{\namecolumnlength}{\maxof{\widthof{\min@moderation}}{\widthof{\min@minutetaker}}}
+    \setlength{\namecolumnlength}{\maxof{\namecolumnlength}{\widthof{\min@timekeeper}}}
+    \setlength{\namecolumnlength}{\maxof{\namecolumnlength}{\widthof{\min@calledby}}}
+%    \end{macrocode}
+%
+% Next take half the table width, subtract the name column, to get the left 
+% label column.  This allows the left side to line up centered.
+%    \begin{macrocode}
+    \newlength{\leftlabellength}
+    \setlength{\leftlabellength}{.5\textwidth-\namecolumnlength}
+%    \end{macrocode}
+%
+% Tie the second column to the length of the longest label
+%
+%    \begin{macrocode}
+     \newlength{\rightlabellength}
+    \setlength{\rightlabellength}{\widthof{\textbf{Type of Meeting:}}}
+%    \end{macrocode}
+%
+% Last column just eats up the rest of the space.
+%
+% Now compute the Widths for attendance table.
+%
+%    \begin{macrocode}
+    
+    \newlength{\attendancelabellength}
+    \setlength{\attendancelabellength}{\widthof{Absent:}}
+    
+    \newlength{\attendancelistlength}{\textwidth-\attendancelabellength}
+%    \end{macrocode}
+%
+% Now we do our full table.  |\resizebox| makes the table the page width.
+% Using tabularx and the array package, we get 4 columns using our computed
+% lengths and some rules from booktabs to make it nice.
+% 
+% This also uses the attendance/absent/guest counters to make a nice layout
+% of who is in the meeting.
+% 
+%    \begin{macrocode}
+  \resizebox{\textwidth}{!}{
+      \begin{tabularx}{\textwidth}{%
+          >{\raggedright\arraybackslash}%
+          p{\leftlabellength} %
+          p{\namecolumnlength} %
+          p{\rightlabellength} %
+          X}
+                \toprule
+                \multirow{4}{*}{\includegraphics[width=\min@logoscale\textwidth]{\min@logo}} & 
+                \multicolumn{3}{l}{\bfseries\sffamily{ \min@shortdate{} \min@title }}  \\
+                \cmidrule{2-4}
+                & \textbf{Date:} & \multicolumn{2}{l}{\min@date} \\
+                & \textbf{Time:} & \multicolumn{2}{l}{\min@starttime} \\
+                & \textbf{Location:} & \multicolumn{2}{l}{\min@location} \\
+                [5.2em]
+                \midrule                
+                \textbf{Meeting Called By:} & \min@moderation & \textbf{Type of Meeting:} & General Meeting  \\
+                \textbf{Facilitator:} & \min@moderation &  \textbf{Note Taker:} & \min@minutetaker \\
+                \textbf{Timekeeper}: & \min@minutetaker &  & \\
+                \midrule
+        \end{tabularx}
+    }\par
+    \begin{tabularx}{\textwidth}{l c r X}
+        \textbf{Present} &(\theAttendeeCounter) & : & \min@participiant \\
+        \textbf{Absent} & (\theAbsentCounter) & : & \min@missing \\
+        \textbf{Guests} & (\theGuestCounter) & : & \min@guest \\
+    \end{tabularx}
+    \tableofcontents
+}
+\def\min@maketitle{\minuteshead}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\callToOrder}
+% This takes the absent and attendee counters and computes if quorum is present.
+% It then lays out (preferably inside a topic) the results of the call to order.
+%
+% The math is pretty straight forward.  Use FP to divide the sum of attendees
+% and absents and round up.  Odd totals like 5 become 3.  Then simply compare.
+%
+%    \begin{macrocode}
+\newcommand{\callToOrder}[1]{%
+  \FPeval\totalMembership{clip(\theAttendeeCounter{}+\theAbsentCounter{})}%
+  \FPeval\quorumMinimum{round(\totalMembership/2, 0)}%
+  \begin{tabular}{l l}
+    Present             & \theAttendeeCounter \\
+    Absent              & \theAbsentCounter   \\
+    Total Membership    & \totalMembership    \\
+    Required for Quorum & \quorumMinimum      \\
+  \end{tabular}\par%
+  \ifnum\quorumMinimum>\theAttendeeCounter
+    There is no quorum.
+  \else
+    Quorum is present and verified.
+  \fi
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\voteUnam}
+%    \begin{macrocode}
+\newcommand{\voteUnam}[1]{\vote{#1}{\theAttendeeCounter}{0}{0}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\voteUnamAgainst}
+%    \begin{macrocode}
+\newcommand{\voteUnamAgainst}[1]{\vote{#1}{0}{\theAttendeeCounter}{0}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\insertPdfSection}
+%    \begin{macrocode}
+\newcommand{\insertPdfSection}[4][single]{%
+  \includepdf[pages={1},pagecommand=\section{Appendix: #2}\label{#3},scale=0.8]{#4}%
+  \IfEq{#1}{multi}{\includepdf[pages={2-}]{#4}}{}%
+}
+%    \end{macrocode}
+%\end{macro}
+%</package>
+%\Finale

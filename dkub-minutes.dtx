@@ -55,7 +55,7 @@ and the derived files           dkub-minutes.ins,
 
 \endpostamble
 \usedir{tex/latex/dkub-minutes}
-\generate{
+\generate{%
   \file{\jobname.sty}{\from{\jobname.dtx}{package}}
 }
 %</install>
@@ -70,6 +70,9 @@ and the derived files           dkub-minutes.ins,
 \generate{
   \file{README.txt}{\from{\jobname.dtx}{readme}}
 }
+\generate{
+  \file{\jobname-example.tex}{\from{\jobname.dtx}{styleguide}}
+}
 \ifx\fmtname\nameofplainTeX
   \expandafter\endbatchfile
 \else
@@ -79,20 +82,21 @@ and the derived files           dkub-minutes.ins,
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{dkub-minutes}[2018/08/29 v1.0 mods]
-\RequirePackage{hyperref}
-\RequirePackage{minutes}
-\RequirePackage{tabularx}
-\RequirePackage{array}
-\RequirePackage{booktabs}
-\RequirePackage{fp}
 %</package>
 %<*driver>
 \documentclass{ltxdoc}
+%% This fixes an issue where minutes.dtx defines task.
+\let\task\undefined
 \usepackage{\jobname}
+\usepackage{lmodern}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{2ex}
+\setcounter{IndexColumns}{2}
+
 \EnableCrossrefs 
 \CodelineIndex 
+\RecordChanges 
 \begin{document}
-  \RecordChanges 
   \DocInput{dkub-minutes.dtx}
 \end{document}
 %</driver>
@@ -100,7 +104,13 @@ and the derived files           dkub-minutes.ins,
 %
 % \GetFileInfo{dkub-minutes.sty}
 %
-% \CheckSum{0}
+% \DoNotIndex{\begin,\bfseries,\captionsenglish,\cmidrule,\contentsname}
+% \DoNotIndex{\def,\edef,\else,\end,\extrasenglish,\fi,\FPeval,\IfEq,\ifnum}
+% \DoNotIndex{\label,\leftlabellength,\maxof,\midrule,\multicollumn,\multirow}
+% \DoNotIndex{\newcounter,\newlength,\par,\raggedright,\RequirePackage}
+% \DoNotIndex{\resizebox,\rightlabellength,\section,\setlength,\sffamily}
+% \DoNotIndex{\StrGobbleLeft,\tableofcontents,\textwidth,\toprule}
+% \DoNotIndex{\widthof}
 %
 % \title{The \textsf{dkub-minutes} package\thanks{This document corresponds
 %   to \textsf{dkub-minutes} \fileversion{}, dated \filedate{}.}}
@@ -111,19 +121,30 @@ and the derived files           dkub-minutes.ins,
 % \changes{1.0}{2018/08/29}{Initial version}
 %
 % \begin{abstract}
+% \noindent
 %   This package provides some modifications to the minutes package
 %   \footnote{\url{https://ctan.org/pkg/minutes}} to assist in writing
 %   minutes while the meeting takes place.
 % \end{abstract}
 %
-% \part{Usage}
-% This package should be used via \texttt{\\usepackage\{dkub-minutes\}} but 
-% it must follow after \texttt{\\usepackage\{minutes\}}.
+% \PrintChanges
+%
+% \section{Usage}
+% This package should be used via \texttt{\\usepackage\{dkub-minutes\}}. It 
+% will automatically require the following packages:
+%
+% \begin{itemize}
+%    \item |hyperref|
+%    \item |minutes|
+%    \item |tabularx|
+%    \item |array|
+%    \item |booktabs|
+%    \item |fp|
+%    \item |calc|
+%    \item |graphicx|
+%    \item |xstring|
+% \end{itemize}
 % 
-%\StopEventually{^^A
-%  \PrintChanges
-%  \PrintIndex
-%}
 % \section{Overview}
 % \subsection{Babel}
 % The package redefines several bable strings to better align with 
@@ -138,12 +159,18 @@ and the derived files           dkub-minutes.ins,
 %   Overview of topics & Overview of Topics \\
 % \end{tabular}
 %
+% 
+%
 % \subsection{New Macros}
-% \DescribeMacro{\shortdate\marg{text}}
+% \DescribeMacro{\shortdate}
+% \marg{text}
+%
 % This sets the short date, normally something like |January 2018| for
 % later use in the customized title.
 %
-% \DescribeMacro{\meetingType\marg{text}}
+% \DescribeMacro{\meetingType}
+% \marg{text}
+%
 % This sets the meeting type, normally something like |General Membership| or
 % |Board| for later use in the customized title.
 %
@@ -161,10 +188,10 @@ and the derived files           dkub-minutes.ins,
 % to point where this file is located. Use the file name w/out an extension.
 %
 % \DescribeMacro{\logoscale\marg{scale}}
-% This takes a floating point number like |.5|.  It ends up using it in
-% the logo's include graphics as the scale against |\textwidth|.  So
+% This takes a floating point number like |.5| given to the |scale| option
+% of |\includegraphics| which pulls in your logo.  So
 % |\logo{mylogo}\logoscale{.5}| will translate to
-% |\includegraphics[width=\min@logoscale\textwidth]{\logo}|
+% |\includegraphics[scale=\min@logoscale]{\logo}|
 %
 % \DescribeMacro{\attendee\marg{name}}
 % This sets an attendee.  All calls to |\attendee| are saved
@@ -252,11 +279,27 @@ and the derived files           dkub-minutes.ins,
 %
 % \marg{pdfPath} is the path to the PDF file to insert.
 % \section{Implementtation}
-%    \begin{macrocode}
-%<*package>
-%    \end{macrocode}
 %
-% \subsection{Babel Updates}
+% \StopEventually{^^A
+%   \PrintIndex
+% }
+% \iffalse
+%<*package>
+% \fi
+% 
+% This requires the necessary packages.
+%    \begin{macrocode}
+\RequirePackage{xstring}
+\RequirePackage{hyperref}
+\RequirePackage{minutes}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{booktabs}
+\RequirePackage{fp}
+\RequirePackage{calc}
+\RequirePackage{graphicx}
+\RequirePackage{multirow}
+%    \end{macrocode}
 %
 %    \begin{macrocode}
 \addto\extrasenglish{%
@@ -380,9 +423,12 @@ and the derived files           dkub-minutes.ins,
 % moderator/minutestaker/calledby/timekeeper names for second column.
 %    \begin{macrocode}
     \newlength{\namecolumnlength}
-    \setlength{\namecolumnlength}{\maxof{\widthof{\min@moderation}}{\widthof{\min@minutetaker}}}
-    \setlength{\namecolumnlength}{\maxof{\namecolumnlength}{\widthof{\min@timekeeper}}}
-    \setlength{\namecolumnlength}{\maxof{\namecolumnlength}{\widthof{\min@calledby}}}
+    \setlength{\namecolumnlength}%
+      {\maxof{\widthof{\min@moderation}}{\widthof{\min@minutetaker}}}
+    \setlength{\namecolumnlength}%
+      {\maxof{\namecolumnlength}{\widthof{\min@timekeeper}}}
+    \setlength{\namecolumnlength}%
+      {\maxof{\namecolumnlength}{\widthof{\min@calledby}}}
 %    \end{macrocode}
 %
 % Next take half the table width, subtract the name column, to get the left 
@@ -395,7 +441,7 @@ and the derived files           dkub-minutes.ins,
 % Tie the second column to the length of the longest label
 %
 %    \begin{macrocode}
-     \newlength{\rightlabellength}
+    \newlength{\rightlabellength}
     \setlength{\rightlabellength}{\widthof{\textbf{Type of Meeting:}}}
 %    \end{macrocode}
 %
@@ -409,6 +455,28 @@ and the derived files           dkub-minutes.ins,
     \setlength{\attendancelabellength}{\widthof{Absent:}}
     
     \newlength{\attendancelistlength}{\textwidth-\attendancelabellength}
+%    \end{macrocode}
+%
+% Now we need to compute some heights to figure out the height of the
+% padding row in the upper portion of the table.
+%
+%    \begin{macrocode}
+    \newlength{\textRowHeight}
+    \setlength{\textRowHeight}{\heightof{Meeting Called By:}*3}
+    \newlength{\imageHeight}
+    \setlength{\imageHeight}{\heightof{%
+      \includegraphics[scale=\min@logoscale]{\min@logo}%
+    }}
+%    \end{macrocode}
+% If the total height of the three text rows is greater than the image height
+% you will get 0.  Otherwise, you \emph{should} end up with the remaining space
+% for your padding row.
+%
+%    \begin{macrocode}
+    \newlength{\paddingRowHeight}
+    \setlength{\paddingRowHeight}{%
+      \maxof{\textRowHeight}{\imageHeight}-{\textRowHeight}%
+    }
 %    \end{macrocode}
 %
 % Now we do our full table.  |\resizebox| makes the table the page width.
@@ -427,16 +495,22 @@ and the derived files           dkub-minutes.ins,
           p{\rightlabellength} %
           X}
                 \toprule
-                \multirow{4}{*}{\includegraphics[width=\min@logoscale\textwidth]{\min@logo}} & 
-                \multicolumn{3}{l}{\bfseries\sffamily{ \min@shortdate{} \min@title }}  \\
+                \multirow{4}{*}{%
+                  \includegraphics[width=\min@logoscale\textwidth]{\min@logo}%
+                } & 
+                \multicolumn{3}{l}{%
+                  \bfseries\sffamily{ \min@shortdate{} \min@title }%
+                }  \\
                 \cmidrule{2-4}
                 & \textbf{Date:} & \multicolumn{2}{l}{\min@date} \\
                 & \textbf{Time:} & \multicolumn{2}{l}{\min@starttime} \\
                 & \textbf{Location:} & \multicolumn{2}{l}{\min@location} \\
-                [5.2em]
+                [\paddingRowHeight]
                 \midrule                
-                \textbf{Meeting Called By:} & \min@moderation & \textbf{Type of Meeting:} & General Meeting  \\
-                \textbf{Facilitator:} & \min@moderation &  \textbf{Note Taker:} & \min@minutetaker \\
+                \textbf{Meeting Called By:} & \min@moderation & 
+                  \textbf{Type of Meeting:} & General Meeting  \\
+                \textbf{Facilitator:} & \min@moderation &  
+                  \textbf{Note Taker:} & \min@minutetaker \\
                 \textbf{Timekeeper}: & \min@minutetaker &  & \\
                 \midrule
         \end{tabularx}
@@ -498,5 +572,51 @@ and the derived files           dkub-minutes.ins,
 }
 %    \end{macrocode}
 %\end{macro}
+% \iffalse
 %</package>
+%<*styleguide>
+% \fi
+% \section{Example Minutes File}
+%    \begin{macrocode}
+\documentclass{article}
+\usepackage{dkub-minutes}
+\graphicspath{ { ./ } }
+\begin{document}
+\begin{Minutes}{A Meeting}
+  \logo{example-logo.png}
+  \logoscale{.25}
+
+  \attendee{Amora}
+  \attendee{BrimZ}
+  \attendee{Cook}
+  \attendee{Luna}
+  \absent{Glamour}
+  \absent{Iona}
+
+  \guest{Tiffany}
+
+  \attendeeDone
+  \absentDone
+  \guestDone
+
+  \moderation{Cook}
+  \calledby{BrimZ}
+  \minutetaker{Amora}
+  \timekeeper{Amora}
+  \location{A Very Strange Place}
+  \starttime{1:00pm}
+  \endtime{3:00pm}
+
+  \minutesdate{August 17, 2018}
+  \meetingtype{Board}
+  \shortdate{August 2018}
+  
+  \maketitle
+  \topic{A Topic}
+\end{Minutes}
+\end{document}
+%    \end{macrocode}
+% \iffalse
+%</styleguide>
+% \fi
 %\Finale

@@ -178,6 +178,10 @@ and the derived files           dkub-minutes.ins,
 %    \item |pdfpages|
 %    \item |multirow|
 % \end{itemize}
+%
+% You will need to include the babel package before this package with your
+% preferred language, though currently only english is supported by 
+% the babel modifications.
 % 
 % \section{Overview}
 % \subsection{Babel Changes}
@@ -387,7 +391,7 @@ and the derived files           dkub-minutes.ins,
 % This requires the necessary packages.
 %    \begin{macrocode}
 \RequirePackage{xstring}
-\RequirePackage{hyperref}
+\RequirePackage[hidelinks]{hyperref}
 \RequirePackage{minutes}
 \RequirePackage{tabularx}
 \RequirePackage{array}
@@ -523,7 +527,7 @@ and the derived files           dkub-minutes.ins,
 \newcommand{\motionedby}[2]{
   \begin{tabularx}{\textwidth}{l X}
         Motioned By: & #1 \\
-        Seconded By: & #2 \\
+        Seconded By: & #2
     \end{tabularx}
 }
 %    \end{macrocode}
@@ -603,9 +607,9 @@ and the derived files           dkub-minutes.ins,
           p{\rightlabellength} %
           X}
                 \toprule
-                \multirow{4}{*}{%
-                  \includegraphics[scale=\min@logoscale]{\min@logo}%
-                } & 
+                \multicolumn{1}{c}{\multirow{4}{*}{%
+                    \includegraphics[scale=\min@logoscale]{\min@logo}%
+                }}& 
                 \multicolumn{3}{l}{%
                   \bfseries\sffamily{ \min@shortdate{} \min@title }%
                 }  \\
@@ -613,7 +617,8 @@ and the derived files           dkub-minutes.ins,
                 & \textbf{Date:} & \multicolumn{2}{l}{\min@date} \\
                 & \textbf{Time:} & \multicolumn{2}{l}{\min@starttime} \\
                 & \textbf{Location:} & \multicolumn{2}{l}{\min@location} \\
-                [\min@logopadding]
+                [\min@logopadding] & \textbf{Location:} & 
+                  \multicolumn{2}{l}{\min@location} \\
                 \midrule                
                 \textbf{Meeting Called By:} & \min@moderation & 
                   \textbf{Type of Meeting:} & General Meeting  \\
@@ -698,6 +703,7 @@ and the derived files           dkub-minutes.ins,
 % \section{Example Minutes File}
 %    \begin{macrocode}
 \documentclass{article}
+\usepackage[english]{babel}
 \usepackage{dkub-minutes}
 \graphicspath{ { ./ } }
 \begin{document}

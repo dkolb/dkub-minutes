@@ -574,10 +574,16 @@ and the derived files           dkub-minutes.ins,
 %    \begin{macrocode}
     \newlength{\textRowHeight}
     \setlength{\textRowHeight}{\heightof{Meeting Called By:}*3}
+    \setlength{\textRowHeight}{%
+      \textRowHeight+\heightof{\bfseries\sffamily{ \min@shortdate{} \min@title }}}
     \newlength{\imageHeight}
-    \setlength{\imageHeight}{\heightof{%
-      \includegraphics[scale=\min@logoscale]{\min@logo}%
-    }}
+    \setlength{\imageHeight}{%
+      \heightof{\includegraphics{\min@logo}}}
+    \setlength{\imageHeight}{\imageHeight*\real{\min@logoscale}}
+
+    \newsavebox{\logoimagesb}
+    \savebox{\logoimagesb}{\includegraphics[scale=\min@logoscale]{\min@logo}}
+    \setlength{\imageHeight}{\ht\logoimagesb}
 %    \end{macrocode}
 % If the total height of the three text rows is greater than the image height
 % you will get 0.  Otherwise, you \emph{should} end up with the remaining space
@@ -586,7 +592,7 @@ and the derived files           dkub-minutes.ins,
 %    \begin{macrocode}
     \newlength{\paddingRowHeight}
     \setlength{\paddingRowHeight}{%
-      \maxof{\textRowHeight}{\imageHeight}-{\textRowHeight}%
+      \maxof{\textRowHeight}{\imageHeight}-{\textRowHeight}-10pt%
     }
 %    \end{macrocode}
 %
@@ -607,7 +613,7 @@ and the derived files           dkub-minutes.ins,
           X}
                 \toprule
                 \multirow{4}{*}{%
-                  \includegraphics[scale=\min@logoscale]{\min@logo}%
+                  \fbox{\includegraphics[scale=\min@logoscale]{\min@logo}}%
                 } & 
                 \multicolumn{3}{l}{%
                   \bfseries\sffamily{ \min@shortdate{} \min@title }%

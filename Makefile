@@ -22,7 +22,7 @@ INST_DOC     = $(TEXMFHOMEDIR)/doc/latex/$(PROJECT_NAME)
 PROJECT_NAME = dkub-minutes
 PROJECT_FILE = $(PROJECT_NAME).dtx
 
-default: obj/$(PROJECT_NAME).pdf
+default: obj/$(PROJECT_NAME).pdf README.txt obj/$(PROJECT_NAME)-example.pdf
 
 display: default
 	(${PDFVIEWER} obj/$(PROJECT_NAME).pdf &)
@@ -66,7 +66,7 @@ endif
 clean::
 	rm -rf obj/
 
-install: obj/$(PROJECT_NAME).pdf obj/$(PROJECT_NAME)-example.pdf
+install: default
 	install -d -v $(INST_TEX) $(INST_SOURCE) $(INST_DOC)
 	install obj/$(PROJECT_NAME).sty $(INST_TEX)
 	install -v latexmkrc Makefile obj/$(PROJECT_NAME).ins $(PROJECT_FILE) \
@@ -106,3 +106,6 @@ obj/$(PROJECT_NAME).pdf: obj/
 
 obj/$(PROJECT_NAME)-example.pdf: obj/$(PROJECT_NAME).pdf
 	latexmk -pdf obj/$(PROJECT_NAME)-example.tex
+
+README.txt: obj/$(PROJECT_NAME).pdf
+	cp -v obj/README.txt README.txt

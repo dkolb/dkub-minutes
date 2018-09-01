@@ -178,6 +178,10 @@ and the derived files           dkub-minutes.ins,
 %    \item |pdfpages|
 %    \item |multirow|
 % \end{itemize}
+%
+% You will need to include the babel package before this package with your
+% preferred language, though currently only english is supported by 
+% the babel modifications.
 % 
 % \section{Overview}
 % \subsection{Babel Changes}
@@ -244,6 +248,16 @@ and the derived files           dkub-minutes.ins,
 % of |\includegraphics| which pulls in your logo.  So
 % |\logo{mylogo}\logoscale{.5}| will translate to
 % |\includegraphics[scale=\min@logoscale]{\logo}|
+%
+% \DescribeMacro{\logopadding}
+% \marg{length}
+%
+% This sets the padding for the last row in the table for the items next to 
+% your logo.  Several attempts were made to compute this lenght, but 
+% it ended up always being too large.  The length should be text, not an
+% actual length set with |\newlength{}| and |\setlength{}{}|.  For example,
+% |\logopadding{5.2em}|
+% 
 %
 % \subsection{Macros for Keeping Attendance}
 %
@@ -377,7 +391,7 @@ and the derived files           dkub-minutes.ins,
 % This requires the necessary packages.
 %    \begin{macrocode}
 \RequirePackage{xstring}
-\RequirePackage{hyperref}
+\RequirePackage[hidelinks]{hyperref}
 \RequirePackage{minutes}
 \RequirePackage{tabularx}
 \RequirePackage{array}
@@ -448,6 +462,12 @@ and the derived files           dkub-minutes.ins,
 \def\logoscale#1{\def\min@logoscale{#1}}
 %    \end{macrocode}
 %\end{macro}
+%\begin{macro}{\logopadding}
+%    \begin{macrocode}
+\def\min@logopadding{0em}
+\def\logopadding#1{\def\min@logopadding{#1}}
+%    \end{macrocode}
+%\end{macro}
 %
 % \subsection{Attendee Macros}
 %
@@ -507,7 +527,7 @@ and the derived files           dkub-minutes.ins,
 \newcommand{\motionedby}[2]{
   \begin{tabularx}{\textwidth}{l X}
         Motioned By: & #1 \\
-        Seconded By: & #2 \\
+        Seconded By: & #2
     \end{tabularx}
 }
 %    \end{macrocode}
@@ -568,31 +588,12 @@ and the derived files           dkub-minutes.ins,
     \newlength{\attendancelistlength}{\textwidth-\attendancelabellength}
 %    \end{macrocode}
 %
-% Now we need to compute some heights to figure out the height of the
-% padding row in the upper portion of the table.
-%
-%    \begin{macrocode}
-    \newlength{\textRowHeight}
-    \setlength{\textRowHeight}{\heightof{Meeting Called By:}*3}
-    \newlength{\imageHeight}
-    \setlength{\imageHeight}{\heightof{%
-      \includegraphics[scale=\min@logoscale]{\min@logo}%
-    }}
-%    \end{macrocode}
-% If the total height of the three text rows is greater than the image height
-% you will get 0.  Otherwise, you \emph{should} end up with the remaining space
-% for your padding row.
-%
-%    \begin{macrocode}
-    \newlength{\paddingRowHeight}
-    \setlength{\paddingRowHeight}{%
-      \maxof{\textRowHeight}{\imageHeight}-{\textRowHeight}%
-    }
-%    \end{macrocode}
-%
 % Now we do our full table.  |\resizebox| makes the table the page width.
 % Using tabularx and the array package, we get 4 columns using our computed
 % lengths and some rules from booktabs to make it nice.
+%
+% The padding for the 4th row on the right side of the logo must be set via
+% |\logopadding|.  It defaults to 0em.
 % 
 % This also uses the attendance/absent/guest counters to make a nice layout
 % of who is in the meeting.
@@ -606,9 +607,9 @@ and the derived files           dkub-minutes.ins,
           p{\rightlabellength} %
           X}
                 \toprule
-                \multirow{4}{*}{%
-                  \includegraphics[scale=\min@logoscale]{\min@logo}%
-                } & 
+                \multicolumn{1}{c}{\multirow{4}{*}{%
+                    \includegraphics[scale=\min@logoscale]{\min@logo}%
+                }}& 
                 \multicolumn{3}{l}{%
                   \bfseries\sffamily{ \min@shortdate{} \min@title }%
                 }  \\
@@ -616,7 +617,8 @@ and the derived files           dkub-minutes.ins,
                 & \textbf{Date:} & \multicolumn{2}{l}{\min@date} \\
                 & \textbf{Time:} & \multicolumn{2}{l}{\min@starttime} \\
                 & \textbf{Location:} & \multicolumn{2}{l}{\min@location} \\
-                [\paddingRowHeight]
+                [\min@logopadding] & \textbf{Location:} & 
+                  \multicolumn{2}{l}{\min@location} \\
                 \midrule                
                 \textbf{Meeting Called By:} & \min@moderation & 
                   \textbf{Type of Meeting:} & General Meeting  \\
@@ -701,6 +703,7 @@ and the derived files           dkub-minutes.ins,
 % \section{Example Minutes File}
 %    \begin{macrocode}
 \documentclass{article}
+\usepackage[english]{babel}
 \usepackage{dkub-minutes}
 \graphicspath{ { ./ } }
 \begin{document}

@@ -25,5 +25,6 @@
 \insertPdfSection[multi%plain]{title}{label%labeldef}{file}
 \meetingtype{text}
 \shortdate{text}
-\logo
-\logoscale
+\logo{file}
+\logoscale{scale}
+\logopadding{length}

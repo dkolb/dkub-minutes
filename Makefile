@@ -73,6 +73,7 @@ install: default
 		obj/$(PROJECT_NAME)-example.tex $(INST_SOURCE)
 	install -v obj/$(PROJECT_NAME).pdf \
 		obj/$(PROJECT_NAME)-example.pdf $(INST_DOC)
+	texhash
 
 install-texstudio:
 	install -d -v $$HOME/.config/texstudio/completion/user

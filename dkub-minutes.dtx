@@ -92,7 +92,7 @@ and the derived files           dkub-minutes.ins,
 %</internal>
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{dkub-minutes}[2018/08/29 v1.0 mods]
+\ProvidesPackage{dkub-minutes}[2018/08/29 v1.3 mods]
 %</package>
 %<*driver>
 \documentclass{ltxdoc}
@@ -100,6 +100,7 @@ and the derived files           dkub-minutes.ins,
 \let\task\undefined
 \usepackage{\jobname}
 \usepackage{lmodern}
+\usepackage{amsmath}
 \setlength{\parindent}{0em}
 \setlength{\parskip}{2ex}
 \setcounter{IndexColumns}{2}
@@ -146,9 +147,12 @@ and the derived files           dkub-minutes.ins,
 %   to \textsf{dkub-minutes} \fileversion{}, dated \filedate{}.}}
 % \author{David Kolb \\ \texttt{david.c.kolb@gmail.com}}
 %
+% \changes{1.0}{2018/08/29}{Initial version}
+% \changes{1.1}{2018/09/15}{Added with speaker macros.}
+% \changes{1.3}{2019/01/12}{Fixes to minutes header.}
+%
 % \maketitle
 %
-% \changes{1.0}{2018/08/29}{Initial version}
 %
 % \begin{abstract}
 % \noindent
@@ -228,7 +232,7 @@ and the derived files           dkub-minutes.ins,
 % This sets the name of the person who called the meeting for
 % later use in the customized title.
 %
-% \DescribeMacro{\timekeepwer}
+% \DescribeMacro{\timekeeper}
 % \marg{name}
 %
 % This sets the name of the person who is the time keeper for
@@ -352,6 +356,26 @@ and the derived files           dkub-minutes.ins,
 % Results in:
 %
 % \motionedby{Mary}{Sam}
+%
+% \subsection{Macros for Topics with speakers}
+%
+% \DescribeMacro{\topicwithspeaker}
+% \marg{short title}\marg{speaker}
+%
+% This will map directly onto 
+% |\topic[|\meta{short title}|]{|\meta{short title}| --- |\meta{speaker}|}|.
+% This will result in the topic title but not the speaker showing up in the
+% list of topics but will list the speaker in the section header.
+%
+% \DescribeMacro{\subtopicwithspeaker}
+% \marg{short title}\marg{speaker}
+%
+% Exact same as |\topicwithspeaker| but for |\subtopic|.
+%
+% \DescribeMacro{\subsubtopicwithspeaker}
+% \marg{short title}\marg{speaker}
+%
+% Exact same as |\topicwithspeaker| but for |\subsubtopic|.
 %
 % \subsection{Macros for Inserting Attachments in the Appendix}
 %
@@ -616,12 +640,11 @@ and the derived files           dkub-minutes.ins,
                 \cmidrule{2-4}
                 & \textbf{Date:} & \multicolumn{2}{l}{\min@date} \\
                 & \textbf{Time:} & \multicolumn{2}{l}{\min@starttime} \\
-                & \textbf{Location:} & \multicolumn{2}{l}{\min@location} \\
                 [\min@logopadding] & \textbf{Location:} & 
                   \multicolumn{2}{l}{\min@location} \\
                 \midrule                
                 \textbf{Meeting Called By:} & \min@moderation & 
-                  \textbf{Type of Meeting:} & General Meeting  \\
+                  \textbf{Type of Meeting:} & \min@meetingtype  \\
                 \textbf{Facilitator:} & \min@moderation &  
                   \textbf{Note Taker:} & \min@minutetaker \\
                 \textbf{Timekeeper}: & \min@minutetaker &  & \\
@@ -650,13 +673,24 @@ and the derived files           dkub-minutes.ins,
 % This takes the absent and attendee counters and computes if quorum is present.
 % It then lays out (preferably inside a topic) the results of the call to order.
 %
-% The math is pretty straight forward.  Use FP to divide the sum of attendees
-% and absents and round up.  Odd totals like 5 become 3.  Then simply compare.
+% The math is pretty straight forward, with one exception.  First we compute
+% total membership by adding the number of people present and absent.  Then
+% we take $1 - (T_m \bmod 2)$ where $T_m$ is the total number of members.  This
+% results in a 1 if the total is even, a 0 if the total is odd.
+%
+% Finally, we divide the total members by 2 to get half, round up, and add 1
+% if the total was even, to find our cut off for the majority of members.
+%
+% The |\ifnum| statement works around the lack of a greather than or equals 
+% comparator by simply defining a \emph{lack} of quorum as being when the 
+% minimum required is strictly greater than the number of attendees.
 %
 %    \begin{macrocode}
 \newcommand{\callToOrder}[1]{%
   \FPeval\totalMembership{clip(\theAttendeeCounter{}+\theAbsentCounter{})}%
-  \FPeval\quorumMinimum{round(\totalMembership/2, 0)}%
+  \FPeval{\evenAdjust}{trunc(\totalMembership-(2*trunc(\totalMembership/2,0)),0)}
+  \FPeval{\evenAdjust}{trunc(1-\evenAdjust,0)}
+  \FPeval\quorumMinimum{trunc(round(\totalMembership/2,0)+\evenAdjust,0)}%
   \begin{tabular}{l l}
     Present             & \theAttendeeCounter \\
     Absent              & \theAbsentCounter   \\
@@ -691,9 +725,32 @@ and the derived files           dkub-minutes.ins,
 %\begin{macro}{\insertPdfSection}
 %    \begin{macrocode}
 \newcommand{\insertPdfSection}[4][single]{%
-  \includepdf[pages={1},pagecommand=\section{Appendix: #2}\label{#3},scale=0.8]{#4}%
-  \IfEq{#1}{multi}{\includepdf[pages={2-}]{#4}}{}%
+  \includepdf[pages={1},pagecommand=\section{Appendix: #2}\label{#3},scale=0.8,frame]{#4}%
+  \IfEq{#1}{multi}{\includepdf[pages={2-},scale=0.8,frame]{#4}}{}%
 }
+%    \end{macrocode}
+%\end{macro}
+%
+% \subsection{Better Topic Headings}
+%
+%\begin{macro}{\topicwithspeaker}
+%    \begin{macrocode}
+\newcommand{\topicwithspeaker}[2]{%
+  \topic[#1]{#1 --- #2}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\subtopicwithspeaker}
+%    \begin{macrocode}
+\newcommand{\subtopicwithspeaker}[2]{%
+  \subtopic[#1]{#1 --- #2}}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\subsubtopicwithspeaker}
+%    \begin{macrocode}
+\newcommand{\subsubtopicwithspeaker}[2]{%
+  \subsubtopic[#1]{#1 --- #2}}
 %    \end{macrocode}
 %\end{macro}
 % \iffalse

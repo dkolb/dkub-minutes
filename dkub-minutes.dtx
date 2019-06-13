@@ -92,7 +92,7 @@ and the derived files           dkub-minutes.ins,
 %</internal>
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{dkub-minutes}[2018/08/29 v1.3 mods]
+\ProvidesPackage{dkub-minutes}[2019/06/13 v1.4 mods]
 %</package>
 %<*driver>
 \documentclass{ltxdoc}
@@ -112,7 +112,7 @@ and the derived files           dkub-minutes.ins,
 
 \EnableCrossrefs 
 \CodelineIndex 
-\RecordChanges 
+\RecordChanges
 \begin{document}
   \DocInput{dkub-minutes.dtx}
 \end{document}
@@ -150,6 +150,7 @@ and the derived files           dkub-minutes.ins,
 % \changes{1.0}{2018/08/29}{Initial version}
 % \changes{1.1}{2018/09/15}{Added with speaker macros.}
 % \changes{1.3}{2019/01/12}{Fixes to minutes header.}
+% \changes{1.4}{2019/06/13}{New header layout}
 %
 % \maketitle
 %
@@ -163,11 +164,9 @@ and the derived files           dkub-minutes.ins,
 %
 % \tableofcontents
 %
-% \PrintChanges
-%
 % \section{Usage}
-% This package should be used via \texttt{\\usepackage\{dkub-minutes\}}. It 
-% will automatically require the following packages:
+% This package should be used via \texttt{\char`\\usepackage\{dkub-minutes\}}.
+% It will automatically require the following packages:
 %
 % \begin{itemize}
 %    \item |hyperref|
@@ -256,11 +255,9 @@ and the derived files           dkub-minutes.ins,
 % \DescribeMacro{\logopadding}
 % \marg{length}
 %
-% This sets the padding for the last row in the table for the items next to 
-% your logo.  Several attempts were made to compute this lenght, but 
-% it ended up always being too large.  The length should be text, not an
-% actual length set with |\newlength{}| and |\setlength{}{}|.  For example,
-% |\logopadding{5.2em}|
+% This sets the padding between the logo and the meeting information table.  
+% The length should be text, not an actual length set with |\newlength{}| 
+% and |\setlength{}{}|.  For example, |\logopadding{5.2em}|
 % 
 %
 % \subsection{Macros for Keeping Attendance}
@@ -404,6 +401,7 @@ and the derived files           dkub-minutes.ins,
 % \section{Implementation}
 %
 % \StopEventually{^^A
+%   \PrintChanges
 %   \PrintIndex
 % }
 % \iffalse
@@ -558,6 +556,8 @@ and the derived files           dkub-minutes.ins,
 %\end{macro}
 
 %\begin{macro}{\minuteshead}
+% \changes{1.3}{2019/01/12}{Fixes to the header added.}
+% \changes{1.4}{2019/06/13}{Simplified layout.}
 % This macro defines a custom header and then redefs it to |\maketitle|.
 %
 % Begin by setting minute's package's internal flag to indicate we generated
@@ -568,98 +568,45 @@ and the derived files           dkub-minutes.ins,
   \minutes@titlesettrue
 %    \end{macrocode}
 %
-% Some math for column lengths. First find the max width of the 
-% moderator/minutestaker/calledby/timekeeper names for second column.
-% Finally, compare it with the width of the longest static label from the
-% upper half of the table, just in case all the names are short.
-% (Like in the example.)
+% Now we do our logo and then table.
 %
-%    \begin{macrocode}
-    \newlength{\namecolumnlength}
-    \setlength{\namecolumnlength}%
-      {\maxof{\widthof{\min@moderation}}{\widthof{\min@minutetaker}}}
-    \setlength{\namecolumnlength}%
-      {\maxof{\namecolumnlength}{\widthof{\min@timekeeper}}}
-    \setlength{\namecolumnlength}%
-      {\maxof{\namecolumnlength}{\widthof{\min@calledby}}}
-    \setlength{\namecolumnlength}%
-      {\maxof{\namecolumnlength}{\widthof{\textbf{Location:}}}}
-%    \end{macrocode}
-%
-% Next take half the table width, subtract the name column, to get the left 
-% label column.  This allows the left side to line up centered.
-%    \begin{macrocode}
-    \newlength{\leftlabellength}
-    \setlength{\leftlabellength}{.5\textwidth-\namecolumnlength}
-%    \end{macrocode}
-%
-% Tie the second column to the length of the longest label
-%
-%    \begin{macrocode}
-    \newlength{\rightlabellength}
-    \setlength{\rightlabellength}{\widthof{\textbf{Type of Meeting:}}}
-%    \end{macrocode}
-%
-% Last column just eats up the rest of the space.
-%
-% Now compute the Widths for attendance table.
-%
-%    \begin{macrocode}
-    
-    \newlength{\attendancelabellength}
-    \setlength{\attendancelabellength}{\widthof{Absent:}}
-    
-    \newlength{\attendancelistlength}{\textwidth-\attendancelabellength}
-%    \end{macrocode}
-%
-% Now we do our full table.  |\resizebox| makes the table the page width.
-% Using tabularx and the array package, we get 4 columns using our computed
-% lengths and some rules from booktabs to make it nice.
-%
-% The padding for the 4th row on the right side of the logo must be set via
-% |\logopadding|.  It defaults to 0em.
+% The padding between the logo and table must be set via |\logopadding|.  It
+% defaults to 0em.
 % 
 % This also uses the attendance/absent/guest counters to make a nice layout
 % of who is in the meeting.
 % 
 %    \begin{macrocode}
-  \resizebox{\textwidth}{!}{
-      \begin{tabularx}{\textwidth}{%
-          >{\raggedright\arraybackslash}%
-          p{\leftlabellength} %
-          p{\namecolumnlength} %
-          p{\rightlabellength} %
-          X}
-                \toprule
-                \multicolumn{1}{c}{\multirow{4}{*}{%
-                    \includegraphics[scale=\min@logoscale]{\min@logo}%
-                }}& 
-                \multicolumn{3}{l}{%
-                  \bfseries\sffamily{ \min@shortdate{} \min@title }%
-                }  \\
-                \cmidrule{2-4}
-                & \textbf{Date:} & \multicolumn{2}{l}{\min@date} \\
-                & \textbf{Time:} & \multicolumn{2}{l}{\min@starttime} \\
-                [\min@logopadding] & \textbf{Location:} & 
-                  \multicolumn{2}{l}{\min@location} \\
-                \midrule                
-                \textbf{Meeting Called By:} & \min@moderation & 
-                  \textbf{Type of Meeting:} & \min@meetingtype  \\
-                \textbf{Facilitator:} & \min@moderation &  
-                  \textbf{Note Taker:} & \min@minutetaker \\
-                \textbf{Timekeeper}: & \min@minutetaker &  & \\
-                \midrule
-        \end{tabularx}
-    }\par
+      \begin{center}
+        \includegraphics[scale=\min@logoscale]{\min@logo}
+      \end{center}
+      \vspace{\min@logopadding}
+      \begin{tabularx}{\textwidth}{l X}
+        \toprule
+        & \\
+        \textbf{Date:} & \min@date \\
+        \textbf{Time:} & \min@starttime \\
+        \textbf{Location:} & \min@location \\
+        \textbf{Meeting Called By:} & \min@moderation \\
+        \textbf{Type of Meeting:} & \min@meetingtype  \\
+        \textbf{Facilitator:} & \min@moderation \\
+        \textbf{Note Taker:} & \min@minutetaker \\
+        \textbf{Timekeeper:} & \min@minutetaker \\
+        & \\
+        \bottomrule
 %    \end{macrocode}
 %
 % Yes, that typo is actually how the internal reference for the minutes package
-% is spelled.  Anywho, this lays out the attendance table.
+% is spelled.  Anywho, this lays out the attendance portion of the table.
 %    \begin{macrocode} 
-    \begin{tabularx}{\textwidth}{l c r X}
-        \textbf{Present} &(\theAttendeeCounter) & : & \min@participiant \\
-        \textbf{Absent} & (\theAbsentCounter) & : & \min@missing \\
-        \textbf{Guests} & (\theGuestCounter) & : & \min@guest \\
+        & \\
+        \textbf{Present (\theAttendeeCounter):} & \min@participiant \\
+        \midrule
+        \textbf{Absent (\theAbsentCounter):} & \min@missing \\
+        \midrule
+        \textbf{Guests (\theGuestCounter):} & \min@guest \\
+        & \\
+        \bottomrule
     \end{tabularx}
     \tableofcontents
 }
@@ -734,6 +681,7 @@ and the derived files           dkub-minutes.ins,
 % \subsection{Better Topic Headings}
 %
 %\begin{macro}{\topicwithspeaker}
+% \changes{1.1}{2018/09/15}{Added.}
 %    \begin{macrocode}
 \newcommand{\topicwithspeaker}[2]{%
   \topic[#1]{#1 --- #2}}
@@ -741,6 +689,7 @@ and the derived files           dkub-minutes.ins,
 %\end{macro}
 %
 %\begin{macro}{\subtopicwithspeaker}
+% \changes{1.1}{2018/09/15}{Added.}
 %    \begin{macrocode}
 \newcommand{\subtopicwithspeaker}[2]{%
   \subtopic[#1]{#1 --- #2}}
@@ -748,6 +697,7 @@ and the derived files           dkub-minutes.ins,
 %\end{macro}
 %
 %\begin{macro}{\subsubtopicwithspeaker}
+% \changes{1.1}{2018/09/15}{Added.}
 %    \begin{macrocode}
 \newcommand{\subsubtopicwithspeaker}[2]{%
   \subsubtopic[#1]{#1 --- #2}}
@@ -767,6 +717,7 @@ and the derived files           dkub-minutes.ins,
 \begin{Minutes}{A Meeting}
   \logo{example-logo.png}
   \logoscale{.25}
+  \logopadding{2em}
 
   \attendee{Amora}
   \attendee{BrimZ}
@@ -795,7 +746,7 @@ and the derived files           dkub-minutes.ins,
   
   \maketitle
   \topic{Call to Order}
-  \callToOrder
+  \callToOrder{1:00pm}
 
   \topic{Who Brings Snacks?}
   \voteUnam{BrimZ brings the snacks.}
